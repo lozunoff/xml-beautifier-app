@@ -1,12 +1,42 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>XML Beautifier App</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
   </head>
   <body>
-
+    <div class="container-fluid h-100 d-flex flex-column justify-content-between">
+      <div class="row flex-grow-0">
+        <div class="col">
+          <h1 class="title text-center">XML Beautifier App</h1>
+        </div>
+      </div>
+      <div class="row flex-grow-1">
+        <div class="col">
+          <textarea class="h-100 w-100 xml-textarea" autofocus></textarea>
+        </div>
+      </div>
+      <div class="row flex-grow-0 py-3">
+        <div class="col d-flex justify-content-center">
+          <button class="btn btn-warning mr-3">Upload</button>
+          <button class="btn btn-warning">Beautify</button>
+          <button class="btn btn-warning ml-3">Save As...</button>
+        </div>
+      </div>
+      <div class="row flex-grow-1">
+        <div class="col">
+          <textarea class="h-100 w-100 xml-textarea" readonly></textarea>
+        </div>
+      </div>
+      <div class="row flex-grow-0 py-2">
+        <div class="col text-center">
+          <div class="copyright">Copyright &copy; 2020 Andrey Lozunov</div>
+          <div class="license">The app released under the <span class="mit">MIT License</span></div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
