@@ -1,4 +1,4 @@
-const { dialog } = require('electron').remote; // eslint-disable-line
+const { dialog, shell } = require('electron').remote; // eslint-disable-line
 const fs = require('fs');
 const XmlBeautify = require('xml-beautify');
 
@@ -8,6 +8,8 @@ const btnBeautify = document.getElementById('btnBeautify');
 const btnSaveAs = document.getElementById('btnSaveAs');
 const input = document.getElementById('input');
 const output = document.getElementById('output');
+const title = document.getElementById('title');
+const mit = document.getElementById('mit');
 
 // Обрабатываем нажатие кнопки "Upload"
 btnUpload.addEventListener('click', async () => {
@@ -140,4 +142,12 @@ btnSaveAs.addEventListener('click', async () => {
     // Если нажата отмена - то просто разрешаем повторное нажатие кнопки
     btnSaveAs.removeAttribute('disabled');
   }
+});
+
+title.addEventListener('click', () => {
+  shell.openExternal('https://github.com/lozunoff/xml-beautifier-app');
+});
+
+mit.addEventListener('click', () => {
+  shell.openExternal('https://github.com/lozunoff/xml-beautifier-app/blob/master/LICENSE');
 });
