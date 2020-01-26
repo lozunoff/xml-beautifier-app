@@ -12,15 +12,21 @@ let mainWindow;
 const createWindow = () => {
   // Создаём окно браузера
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1100,
+    height: 690,
+    minWidth: 470,
+    minHeight: 542,
+    webPreferences: {
+      nodeIntegration: true,
+      devTools: false,
+    },
   });
 
   // Загружаем UI
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Отображаем средства разработчика
-  mainWindow.webContents.openDevTools();
+  // Скрыть стандартное меню
+  mainWindow.removeMenu();
 
   // Обрабатываем событие закрытия окна
   mainWindow.on('closed', () => {
