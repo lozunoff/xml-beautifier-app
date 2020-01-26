@@ -5,7 +5,6 @@
     <title>XML Beautifier App</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
   </head>
   <body>
     <div class="container-fluid h-100 d-flex flex-column justify-content-between">
@@ -16,19 +15,19 @@
       </div>
       <div class="row flex-grow-1">
         <div class="col">
-          <textarea class="h-100 w-100 xml-textarea" autofocus></textarea>
+          <textarea id="input" class="h-100 w-100 xml-textarea" autofocus></textarea>
         </div>
       </div>
       <div class="row flex-grow-0 py-3">
         <div class="col d-flex justify-content-center">
-          <button class="btn btn-warning mr-3">Upload</button>
-          <button class="btn btn-warning">Beautify</button>
-          <button class="btn btn-warning ml-3">Save As...</button>
+          <button id="btnUpload" class="btn btn-warning mr-3">Upload</button>
+          <button id="btnBeautify" class="btn btn-warning">Beautify</button>
+          <button id="btnSaveAs" class="btn btn-warning ml-3">Save As...</button>
         </div>
       </div>
       <div class="row flex-grow-1">
         <div class="col">
-          <textarea class="h-100 w-100 xml-textarea" readonly></textarea>
+          <textarea id="output" class="h-100 w-100 xml-textarea" readonly></textarea>
         </div>
       </div>
       <div class="row flex-grow-0 py-2">
@@ -38,5 +37,9 @@
         </div>
       </div>
     </div>
+
+    <script>
+      require('./app.js');
+    </script>
   </body>
 </html>
