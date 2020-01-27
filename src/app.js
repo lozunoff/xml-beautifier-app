@@ -11,10 +11,35 @@ const output = document.getElementById('output');
 const title = document.getElementById('title');
 const mit = document.getElementById('mit');
 
+// Функция, блокирующая нажатие элементов
+const disableElements = (...buttons) => {
+  buttons.forEach((btn) => btn.setAttribute('disabled', 'disabled'));
+};
+
+// Функция, разблокирующая нажатие элементов
+const enableElements = (...buttons) => {
+  buttons.forEach((btn) => btn.removeAttribute('disabled'));
+};
+
+// Функция, меняющая классы у элементов
+const changeClasses = (element, classesToDelete = [], classesToAdd = []) => {
+  classesToDelete.forEach((item) => {
+    if (element.classList.contains(item)) {
+      element.classList.remove(item);
+    }
+  });
+
+  classesToAdd.forEach((item) => {
+    if (!element.classList.contains(item)) {
+      element.classList.add(item);
+    }
+  });
+};
+
 // Обрабатываем нажатие кнопки "Upload"
 btnUpload.addEventListener('click', async () => {
-  // Блокируем кнопку для повторного нажатия
-  btnUpload.setAttribute('disabled', 'disabled');
+  // Временно блокируем нажатие элементов
+  disableElements(btnUpload, btnBeautify, btnSaveAs, input);
 
   // Открываем диалоговое окно выбора файла
   const result = await dialog.showOpenDialog({
@@ -37,71 +62,62 @@ btnUpload.addEventListener('click', async () => {
         // Если ошибок нет - помещаем контент в первый <textarea>
         input.value = content;
         // Сигнализируем цветом кнопки об успешности операции
-        btnUpload.classList.remove('btn-warning');
-        btnUpload.classList.remove('btn-danger');
-        btnUpload.classList.add('btn-success');
+        changeClasses(btnUpload, ['btn-warning', 'btn-danger'], ['btn-success']);
       } else {
         // Если файл прочитать не удалось - сигнализируем цветом кнопки о провале
-        btnUpload.classList.remove('btn-warning');
-        btnUpload.classList.remove('btn-success');
-        btnUpload.classList.add('btn-danger');
+        changeClasses(btnUpload, ['btn-warning', 'btn-success'], ['btn-danger']);
       }
 
       setTimeout(() => {
         // По истечению таймаута сбрасываем стили кнопки на дефолтные
-        btnUpload.classList.remove('btn-success');
-        btnUpload.classList.remove('btn-danger');
-        btnUpload.classList.add('btn-warning');
-        // Разрешаем повторное нажатие кнопки
-        btnUpload.removeAttribute('disabled');
+        changeClasses(btnUpload, ['btn-danger', 'btn-success'], ['btn-warning']);
+        // Снимаем блокировку с элементов
+        enableElements(btnUpload, btnBeautify, btnSaveAs, input);
       }, 200);
     });
   } else {
-    // Если нажата отмена - то просто разрешаем повторное нажатие кнопки
-    btnUpload.removeAttribute('disabled');
+    // Если нажата отмена - то снимаем блокировку с элементов
+    enableElements(btnUpload, btnBeautify, btnSaveAs, input);
   }
 });
 
 // Обрабатываем нажатие кнопки "Upload"
 btnBeautify.addEventListener('click', () => {
   // Блокируем кнопку для повторного нажатия
-  btnBeautify.setAttribute('disabled', 'disabled');
+  disableElements(btnBeautify);
 
   // Считываем проблемный контент и пытаемся привести в нормальный вид
   const beautify = new XmlBeautify().beautify(input.value);
+
+  // Очищаем output при каждом нажатии
+  output.value = '';
 
   // Если преобразование прошло без проблем
   if (beautify.indexOf('This page contains the following errors') === -1) {
     // Помещаем преобразованный контент во второй <textarea>
     output.value = beautify;
     // Сигнализируем цветом кнопки об успешности операции
-    btnBeautify.classList.remove('btn-warning');
-    btnBeautify.classList.remove('btn-danger');
-    btnBeautify.classList.add('btn-success');
+    changeClasses(btnBeautify, ['btn-warning', 'btn-danger'], ['btn-success']);
   } else {
     // Если возникли пробелмы - сигнализируем цветом кнопки о провале
-    btnBeautify.classList.remove('btn-warning');
-    btnBeautify.classList.remove('btn-success');
-    btnBeautify.classList.add('btn-danger');
+    changeClasses(btnBeautify, ['btn-warning', 'btn-success'], ['btn-danger']);
     // Парсим ответ, находим ошибку и помещаем ее в <textarea> вместо контента
     const error = beautify.match(/<div.+>(.+)\s?<\/div>/i)[1];
-    output.value = `Error: ${error}`;
+    output.value = error[0].toUpperCase() + error.slice(1);
   }
 
   setTimeout(() => {
     // По истечению таймаута сбрасываем стили кнопки на дефолтные
-    btnBeautify.classList.remove('btn-success');
-    btnBeautify.classList.remove('btn-danger');
-    btnBeautify.classList.add('btn-warning');
+    changeClasses(btnBeautify, ['btn-danger', 'btn-success'], ['btn-warning']);
     // Разрешаем повторное нажатие кнопки
-    btnBeautify.removeAttribute('disabled');
+    enableElements(btnBeautify);
   }, 200);
 });
 
 // Обрабатываем нажатие кнопки "Save As..."
 btnSaveAs.addEventListener('click', async () => {
-  // Блокируем кнопку для повторного нажатия
-  btnSaveAs.setAttribute('disabled', 'disabled');
+  // Временно блокируем нажатие элементов
+  disableElements(btnUpload, btnBeautify, btnSaveAs);
 
   // Открываем диалоговое окно сохранения файла
   const result = await dialog.showSaveDialog({
@@ -119,35 +135,31 @@ btnSaveAs.addEventListener('click', async () => {
     await fs.writeFile(filePath, output.value, (err) => {
       if (!err) {
         // Если ошибок нет - сигнализируем цветом кнопки об успешности операции
-        btnSaveAs.classList.remove('btn-warning');
-        btnSaveAs.classList.remove('btn-danger');
-        btnSaveAs.classList.add('btn-success');
+        changeClasses(btnSaveAs, ['btn-warning', 'btn-danger'], ['btn-success']);
       } else {
         // Если возникли пробелмы - сигнализируем цветом кнопки о провале
-        btnSaveAs.classList.remove('btn-warning');
-        btnSaveAs.classList.remove('btn-success');
-        btnSaveAs.classList.add('btn-danger');
+        changeClasses(btnSaveAs, ['btn-warning', 'btn-success'], ['btn-danger']);
       }
 
       setTimeout(() => {
         // По истечению таймаута сбрасываем стили кнопки на дефолтные
-        btnSaveAs.classList.remove('btn-success');
-        btnSaveAs.classList.remove('btn-danger');
-        btnSaveAs.classList.add('btn-warning');
-        // Разрешаем повторное нажатие кнопки
-        btnSaveAs.removeAttribute('disabled');
+        changeClasses(btnSaveAs, ['btn-danger', 'btn-success'], ['btn-warning']);
+        // Снимаем блокировку с элементов
+        enableElements(btnUpload, btnBeautify, btnSaveAs);
       }, 200);
     });
   } else {
-    // Если нажата отмена - то просто разрешаем повторное нажатие кнопки
-    btnSaveAs.removeAttribute('disabled');
+    // Если нажата отмена - то снимаем блокировку с элементов
+    enableElements(btnUpload, btnBeautify, btnSaveAs);
   }
 });
 
+// При нажатии по заголовку программы переходим в репо
 title.addEventListener('click', () => {
   shell.openExternal('https://github.com/lozunoff/xml-beautifier-app');
 });
 
+// При нажатии по типу лицензии переходим в описание лицензии в репо
 mit.addEventListener('click', () => {
   shell.openExternal('https://github.com/lozunoff/xml-beautifier-app/blob/master/LICENSE');
 });

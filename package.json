@@ -2,7 +2,7 @@
   "name": "xml-beautifier-app",
   "productName": "xml-beautifier-app",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Simple desktop XML Beautifier",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
