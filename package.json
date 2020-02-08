@@ -46,8 +46,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.4.1",
-    "electron-squirrel-startup": "^1.0.0",
-    "xml-beautify": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.47",
