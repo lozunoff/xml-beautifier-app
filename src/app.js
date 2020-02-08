@@ -1,6 +1,6 @@
 const { dialog, shell } = require('electron').remote; // eslint-disable-line
 const fs = require('fs');
-const XmlBeautify = require('xml-beautify');
+const beautify = require('./beautifier');
 
 // Получаем элементы интерфейса, с которыми будем взаимодействовать
 const btnUpload = document.getElementById('btnUpload');
@@ -86,24 +86,20 @@ btnBeautify.addEventListener('click', () => {
   // Блокируем кнопку для повторного нажатия
   disableElements(btnBeautify);
 
-  // Считываем проблемный контент и пытаемся привести в нормальный вид
-  const beautify = new XmlBeautify().beautify(input.value);
-
   // Очищаем output при каждом нажатии
   output.value = '';
 
   // Если преобразование прошло без проблем
-  if (beautify.indexOf('This page contains the following errors') === -1) {
+  try {
     // Помещаем преобразованный контент во второй <textarea>
-    output.value = beautify;
+    output.value = beautify(input.value);
     // Сигнализируем цветом кнопки об успешности операции
     changeClasses(btnBeautify, ['btn-warning', 'btn-danger'], ['btn-success']);
-  } else {
+  } catch (e) {
     // Если возникли пробелмы - сигнализируем цветом кнопки о провале
     changeClasses(btnBeautify, ['btn-warning', 'btn-success'], ['btn-danger']);
     // Парсим ответ, находим ошибку и помещаем ее в <textarea> вместо контента
-    const error = beautify.match(/<div.+>(.+)\s?<\/div>/i)[1];
-    output.value = error[0].toUpperCase() + error.slice(1);
+    output.value = e;
   }
 
   setTimeout(() => {
