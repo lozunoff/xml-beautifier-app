@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>XML Beautifier App</title>
+    <link rel="stylesheet" href="../css/app.css">
+  </head>
+  <body class="app">
+    <div class="app__container">
+      <div class="app__header">
+          <h1 id="title" class="title">XML Beautifier App</h1>
+      </div>
+      <div class="app__xml-area-container">
+        <div id="input" contenteditable="true" class="app__xml-area" autocapitalize="off" spellcheck="false" autofocus></div>
+      </div>
+      <div class="app__middle">
+        <div class="app__btn-container">
+          <button id="btnUpload" class="btn">Upload</button>
+          <button id="btnBeautify" class="btn">Beautify</button>
+        </div>
+        <div class="app__status-bar">
+          <div id='status' class="app__status">&uarr;&nbsp;&nbsp;&nbsp;Paste or upload your XML&nbsp;&nbsp;&nbsp;&uarr;</div>
+        </div>
+        <div class="app__btn-container">
+          <button id="btnSettings" class="btn">Settings</button>
+          <button id="btnSaveAs" class="btn">Save As...</button>
+        </div>
+      </div>
+      <div class="app__xml-area-container">
+        <div id="output" class="app__xml-area" autocapitalize="off" spellcheck="false"></div>
+      </div>
+      <div class="app__footer">
+          <div class="copyright">Copyright &copy; 2020 Andrey Lozunov</div>
+          <div class="license">The app released under the <span id='licenseLink' class="license__link">MIT License</span></div>
+      </div>
+    </div>
+
+    <script>
+      require('../js/app.js');
+    </script>
+  </body>
+</html>

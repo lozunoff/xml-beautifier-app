@@ -23,7 +23,7 @@ const createWindow = () => {
   });
 
   // Загружаем UI
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'html/app.html'));
 
   // Скрыть стандартное меню
   mainWindow.removeMenu();
