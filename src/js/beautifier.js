@@ -1,21 +1,29 @@
-const beautify = (xml, options = {}) => {
+const beautify = (xml, options = {
+  tabSize: 4,
+  endLine: '\r\n',
+  useSelfClosingTags: false,
+  delComments: false,
+}) => {
   // Разбираем переданные настройки или присваиваем значения по умолчанию
-  const tabSize = options.tabSize || 4;
-  const endLine = options.endLine || '\r\n';
-  const useSelfClosingTags = (!options.useSelfClosingTags) ? false : options.useSelfClosingTags;
-  const delComments = (!options.delComments) ? true : options.delComments;
+  const {
+    tabSize, endLine, useSelfClosingTags, delComments,
+  } = options;
 
-  // Обрезаем концевые пробелы
-  let input = xml.trim().replace(/[\r\n\t]+/g, '').replace(/>\s+</g, '><');
+  // Наводим красоту в исходном тексте - обрезаем лишние пробелы, переносы и т.д.
+  let input = xml.trim()
+    .replace(/[\r\n\t]+/g, '')
+    .replace(/>\s+</g, '><')
+    .replace(/ {2,}/g, ' ')
+    .replace(/&/g, '&amp;');
 
   // Если получен пустой текст - бросаем исключение
   if (!input) {
-    throw new Error('Document is empty');
+    throw new Error('Document is empty!');
   }
 
-  // Удаляем комментарии, если удаление не отключено
+  // Удаляем комментарии, если это необходимо
   if (delComments) {
-    input = input.replace(/<!--[\s\S]*-->/ig, '');
+    input = input.replace(/(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '');
   }
 
   // Преобразовываем текст в xml-документ
@@ -26,11 +34,11 @@ const beautify = (xml, options = {}) => {
   const parsererror = parsedXml.getElementsByTagName('parsererror');
   // Если тег найден - бросаем исключение
   if (parsererror.length) {
-    throw new Error('XML Parsing Error');
+    throw new Error('XML Parsing Error!');
   }
 
-  // Переменная для формирования результата
-  let output = '';
+  // Массив для формирования результата
+  const output = [];
 
   // Набор символов для формирования тегов
   const tags = {
@@ -46,7 +54,7 @@ const beautify = (xml, options = {}) => {
   };
 
   // Создаем стек для перебора xml-дерева и помещаем в него первый элемент - корневой тег
-  // Свойство 'tagType' отвечает за переключение между открывающим и закрывающим тегами
+  // Свойство 'tagType' отвечает за нужный тип тега (открывающий, закрывающий, комментарий)
   const stack = [{ node: parsedXml.children[0], tagType: 'opening' }];
 
   // Счетчик для остеживания текущего значения отступов
@@ -58,6 +66,8 @@ const beautify = (xml, options = {}) => {
     const element = stack[stack.length - 1];
     // Получаем текущий xml-тег
     const { node } = element;
+    // Формируем новую строку для результата
+    let str = '';
 
     // Если тип тега - "открывающий"
     if (element.tagType === 'opening') {
@@ -68,26 +78,26 @@ const beautify = (xml, options = {}) => {
         attrs += ` ${attr.name}="${attr.textContent}"`;
       }
 
-      // Добавляем к результату перенос строки
+      // Добавляем к результату перенос строки (исключение - корневой тег)
       if (node.parentNode.nodeType !== 9) {
-        output += endLine;
+        str += endLine;
       }
 
       // Формируем отступ перед тегом
       for (let j = 0; j < indentCounter; j += 1) {
-        output += ' ';
+        str += ' ';
       }
 
       // Формируем начало открывающего тега
-      output += `${tags.start.prefix}${node.tagName}${attrs}`;
+      str += `${tags.start.prefix}${node.tagName}${attrs}`;
 
       // Если нода пустая и включен режим само-закрывающихся тегов
       if (!node.childNodes.length && useSelfClosingTags) {
         // Используем само-закрывающийся тег
-        output += tags.start.short;
+        str += tags.start.short;
       } else {
         // Иначе - закрываем как обычно
-        output += tags.start.suffix;
+        str += tags.start.suffix;
       }
 
       // Если у текущего узла есть потомки, среди которых нет текста - увеличиваем отступ
@@ -99,17 +109,13 @@ const beautify = (xml, options = {}) => {
       if (node.childNodes.length) {
         for (let i = node.childNodes.length - 1; i >= 0; i -= 1) {
           if (node.childNodes[i].nodeType === 3) {
-            // Если потомок текстовый узел - добавляем контент
-            output += node.childNodes[i].nodeValue;
+            // Если потомок - текстовый узел - добавляем контент
+            str += node.childNodes[i].nodeValue;
           } else if (node.childNodes[i].nodeType === 8) {
-            // Если потомок комментарий - добавляем отступ и сам комментарий
-            output += endLine;
-            for (let j = 0; j < indentCounter; j += 1) {
-              output += ' ';
-            }
-            output += `<!-- ${node.childNodes[i].nodeValue} -->`;
+            // Если потомок - комментарий - добавляем в стек элемент с типом тега "comment"
+            stack.push({ node: node.childNodes[i], tagType: 'comment' });
           } else if (node.childNodes[i].nodeType === 1) {
-            // Если потомок обычный узел - добавляем в стек новый элемент
+            // Если потомок обычный узел - добавляем в стек новый элемент с типом тега "opening"
             stack.push({ node: node.childNodes[i], tagType: 'opening' });
           }
         }
@@ -126,19 +132,33 @@ const beautify = (xml, options = {}) => {
         // Проверяем, что перед тегом не было текста
         if (node.children.length) {
           // Добавляем перенос строки и уменьшаем отступ
-          output += endLine;
+          str += endLine;
           indentCounter -= tabSize;
           for (let j = 0; j < indentCounter; j += 1) {
-            output += ' ';
+            str += ' ';
           }
         }
         // Вставляем обычный закрывающий тег
-        output += `${tags.end.prefix}${node.tagName}${tags.end.suffix}`;
+        str += `${tags.end.prefix}${node.tagName}${tags.end.suffix}`;
       }
 
       // Удаляем из стека последний элемент
       stack.pop();
     }
+
+    // Если тип тега - "комментарий"
+    if (element.tagType === 'comment') {
+      str += endLine;
+      for (let j = 0; j < indentCounter; j += 1) {
+        str += ' ';
+      }
+      str += `<!-- ${node.nodeValue} -->`;
+      // Удаляем из стека последний элемент
+      stack.pop();
+    }
+
+    // Добавляем сформированную строку в итоговый массив
+    output.push(str);
   }
 
   // Проверяем, была ли декларация у исходного текста
@@ -149,11 +169,14 @@ const beautify = (xml, options = {}) => {
     const version = input.match(/<\?xml.+version=['"]([\d.]+)['"].*\?>/i)[1] || '1.0';
     // Формируем декларацию и добавляем в результат
     const declaration = `<?xml version="${version}" encoding="${encoding}"?>`;
-    output = `${declaration}${endLine}${output}`;
+    output.unshift(`${declaration}${endLine}`);
   }
 
+  // Добавляем перенос после крайнего элемента
+  output.push(endLine);
+
   // Возвращаем результат
-  return `${output}${endLine}`;
+  return output;
 };
 
 module.exports = beautify;
