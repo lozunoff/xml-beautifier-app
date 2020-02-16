@@ -15,5 +15,11 @@
         "ecmaVersion": 2018
     },
     "rules": {
+
+    },
+    "settings": {
+        "import/core-modules": [
+            "electron"
+        ]
     }
 }
