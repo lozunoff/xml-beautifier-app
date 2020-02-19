@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings</title>
+  <link rel="stylesheet" href="../css/bootstrap-reboot.min.css">
+  <link rel="stylesheet" href="../css/settings.css">
+</head>
+<body class="settings">
+  <div class="settings__container">
+    <form class="settings__form form">
+      <div class="form__group">
+        <label class="form__input-label" for="inputTabSize">Indent size:</label>
+        <input type="number" class="form__input" id="inputTabSize" value="4">
+      </div>
+      <div class="form__group">
+        <label class="form__input-label" for="selectEndLine" autocapitalize="off" spellcheck="false">Line separators:</label>
+        <select class="form__select" id="selectEndLine">
+          <option class="form__select-item" value="crlf">\r\n</option>
+          <option class="form__select-item" value="lf">\n</option>
+          <option class="form__select-item" value="cr">\r</option>
+        </select>
+      </div>
+      <div class="form__check">
+        <input type="checkbox" class="form__checkbox" id="selfClosingTagsFlag">
+        <label class="form__checkbox-label" for="selfClosingTagsFlag">Use self closing tags</label>
+      </div>
+      <div class="form__check">
+        <input type="checkbox" class="form__checkbox" id="delCommentsFlag">
+        <label class="form__checkbox-label" for="delCommentsFlag">Delete comments</label>
+      </div>
+      <div class="form__btn-group">
+        <button id="btnOk" class="btn">Ok</button>
+        <button id="btnCancel" class="btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    require('../js/settings.js');
+  </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 const { remote } = require('electron');
 const fs = require('fs');
+const path = require('path');
 const beautify = require('./beautifier');
 
 const { dialog, shell } = remote;
@@ -126,7 +127,30 @@ btnBeautify.addEventListener('click', async () => {
 });
 
 // Обрабатываем нажатие кнопки "Settings"
-btnSettings.addEventListener('click', () => false);
+btnSettings.addEventListener('click', () => {
+  // Создаем окно с настройками
+  const settingsWindow = new remote.BrowserWindow({
+    width: 400,
+    height: 300,
+    parent: remote.getCurrentWindow(),
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      devTools: false,
+    },
+  });
+
+  // Загружаем в окно settings.html
+  settingsWindow.loadFile(path.join(__dirname, '../html/settings.html'));
+
+  // Скрываем стандартное меню окна
+  settingsWindow.removeMenu();
+
+  // Сбрасываем фокус с кнопки "Settings"
+  btnSettings.blur();
+});
 
 // Обрабатываем нажатие кнопки "Save As..."
 btnSaveAs.addEventListener('click', async () => {
