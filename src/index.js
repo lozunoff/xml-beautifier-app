@@ -1,17 +1,14 @@
-const { app, BrowserWindow } = require('electron'); // eslint-disable-line
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
-// Обработка создания/удаления ярлыков при установке/удалении
+// Обрабатываем на Windows события создания/удаления ярлыков при инсталяции/деинсталяции приложения
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
 }
 
-// Переменная для хранения глобальной ссылки на объект окна
-let mainWindow;
-
 const createWindow = () => {
-  // Создаём окно браузера
-  mainWindow = new BrowserWindow({
+  // Создаем главное окно приложения
+  const mainWindow = new BrowserWindow({
     width: 1100,
     height: 690,
     minWidth: 470,
@@ -22,31 +19,26 @@ const createWindow = () => {
     },
   });
 
-  // Загружаем UI
+  // Загружаем в главное окно app.html
   mainWindow.loadFile(path.join(__dirname, 'html/app.html'));
 
-  // Скрыть стандартное меню
+  // Скрываем стандартное меню окна
   mainWindow.removeMenu();
-
-  // Обрабатываем событие закрытия окна
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
 };
 
-// Приступаем к созданию окна после инициализации Electron
+// Приступаем к созданию окна после инициализации приложения
 app.on('ready', createWindow);
 
-// Выходим, когда все окна будут закрыты.
+// Выходим из приложения по закрытию всех окон
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-// Пересоздаем окно на MacOS после того, как на иконку в доке нажали и других открытых окон нет
+// Создаем окно по клику на иконку в панели OS X
 app.on('activate', () => {
-  if (mainWindow === null) {
+  if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
