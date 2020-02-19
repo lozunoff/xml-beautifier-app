@@ -190,3 +190,25 @@ output.addEventListener('scroll', () => {
     outputRowCounter += 1;
   }
 });
+
+// Запрещаем вырезать текст из output
+output.addEventListener('cut', (e) => {
+  e.preventDefault();
+  return false;
+});
+
+// Запрещаем вставку текста в output
+output.addEventListener('paste', (e) => {
+  e.preventDefault();
+  return false;
+});
+
+// Запрещаем ввод текста в output
+output.addEventListener('keydown', (e) => {
+  if (!e.ctrlKey) {
+    e.preventDefault();
+    return false;
+  }
+
+  return true;
+});
