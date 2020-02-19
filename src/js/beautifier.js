@@ -73,7 +73,7 @@ const beautify = (xml, options = {
     if (element.tagType === 'opening') {
       // Перебираем имеющиеся у ноды атрибуты
       let attrs = '';
-      for (let i = 0; i < node.attributes.length; i += 1) {
+      for (let i = node.attributes.length - 1; i >= 0; i -= 1) {
         const attr = node.attributes[i];
         attrs += ` ${attr.name}="${attr.textContent}"`;
       }
