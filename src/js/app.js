@@ -16,14 +16,30 @@ const title = document.getElementById('title');
 const licenseLink = document.getElementById('licenseLink');
 const status = document.getElementById('status');
 
-// Массив для хранения входящего текста в виде строк
+// Массив для хранения исходного xml в виде отдельных строк
 let inputArray = [];
-// Счетчик для отслеживания кол-ва выведеных строк
+// Счетчик для отслеживания кол-ва показанных в input строк
 let inputRowCounter = 0;
-// Массив для хранения обработанного текста в виде строк
+// Массив для хранения обработанного xml в виде отдельных строк
 let outputArray = [];
-// Счетчик для отслеживания кол-ва выведеных строк
+// Счетчик для отслеживания кол-ва показанных в output строк
 let outputRowCounter = 0;
+
+// Функция для получения настроек из локального хранилища браузера
+const getOptionsFromStorage = () => {
+  // Достаем из хранилища настройки, если они существуют
+  if (window.localStorage.options) {
+    return JSON.parse(window.localStorage.options);
+  }
+
+  // Возвращаем значения по умолчанию, если настроек в хранилище нет
+  return {
+    tabSize: 4,
+    endLine: '\r\n',
+    useSelfClosingTags: false,
+    delComments: false,
+  };
+};
 
 // Обрабатываем нажатие кнопки "Upload"
 btnUpload.addEventListener('click', async () => {
@@ -57,7 +73,7 @@ btnUpload.addEventListener('click', async () => {
         input.scrollTop = 0;
         input.scrollLeft = 0;
         // Разбиваем содержимое файла на массив строк
-        inputArray = content.split(/\r?\n/);
+        inputArray = content.split(/(\r\n|\n|\r)+/);
         // Если после разбивки получается меньше 1000 строк
         if (inputArray.length < 1000) {
           // Выводим в input весь полученный текст
@@ -65,27 +81,28 @@ btnUpload.addEventListener('click', async () => {
           // Увеличиваем счетчик до максимального значения
           inputRowCounter = inputArray.length;
         } else {
-          // Если после разбивки получилось больше 1000 строк
+          // Если строк больше 1000 - выводим только первую 1000
+          const options = getOptionsFromStorage();
           for (let row = 0; row < 1000; row += 1) {
-            // Выводим только первую 1000
-            input.insertAdjacentText('beforeEnd', `${inputArray[row]}\r\n`);
+            input.insertAdjacentText('beforeEnd', `${inputArray[row]}${options.endLine}`);
             inputRowCounter += 1;
           }
         }
-        // Выводим сообщение об успешной загрузке
+        // Выводим сообщение об успешной загрузке файла
         status.innerText = 'Uploaded successfully!';
       } else {
-        // Иначе - выводим сообщение о провале
+        // Если файл прочитать не удалось - выводим сообщение о провале
         status.innerText = 'Upload failed!';
       }
     });
   }
 
+  // Сбрасываем фокус с кнопки "Upload"
   btnUpload.blur();
 });
 
 // Обрабатываем нажатие кнопки "Beautify"
-btnBeautify.addEventListener('click', async () => {
+btnBeautify.addEventListener('click', () => {
   // Выводим сообщение с просьбой подождать
   status.innerText = 'Please, wait...';
   // Очищаем output от имеющихся данных
@@ -100,16 +117,19 @@ btnBeautify.addEventListener('click', async () => {
 
   setTimeout(() => {
     try {
-      // Склеиваем массив строк и передаем в beautifier, в ответ получаем новый массив строк
-      outputArray = beautify(inputArray.join('\r\n'));
-      // Проверяем кол-во строк в обработанном результате
+      const options = getOptionsFromStorage();
+      // Склеиваем строки из inputArray в единный текст и передаем в beautifier
+      // После обработки получаем массив новых строк
+      outputArray = beautify(inputArray.join(options.endLine), options);
+
+      // Считаем кол-во строк в полученном результате
       if (outputArray.length < 1000) {
-        // Если на выходе получили менее 1000 строк, выводим в output весь текст
+        // Если после обработки полуилось менее 1000 строк - выводим в output весь текст
         output.insertAdjacentText('beforeEnd', outputArray.join(''));
         // Увеличиваем счетчик до максимального значения
         outputRowCounter = outputArray.length;
       } else {
-        // Если на выходе получили более 1000 строк, выводим только первую 1000
+        // Если после обработки полуилось более 1000 строк - выводим только первую 1000
         for (let row = 0; row < 1000; row += 1) {
           output.insertAdjacentText('beforeEnd', outputArray[outputRowCounter]);
           outputRowCounter += 1;
@@ -118,11 +138,12 @@ btnBeautify.addEventListener('click', async () => {
       // Выводим сообщение об успешном преобразовании
       status.innerText = 'Successfully!';
     } catch (e) {
-      // Иначе - выводим текст ошибки
+      // Если преобразование не удалось - выводим сообщение о провале
       status.innerText = e.message;
     }
   }, 100);
 
+  // Сбрасываем фокус с кнопки "Beautify"
   btnBeautify.blur();
 });
 
@@ -165,7 +186,7 @@ btnSaveAs.addEventListener('click', async () => {
   if (result.canceled === false) {
     // Выводим сообщение с просьбой подождать
     status.innerText = 'Please, wait...';
-    // Запоминаем путь для сохранения
+    // Запоминаем путь для нового файла
     const { filePath } = result;
 
     // Пытаемся сохранить исправленный контент в файл
@@ -174,31 +195,35 @@ btnSaveAs.addEventListener('click', async () => {
         // Выводим сообщение об успешном сохранении
         status.innerText = 'Saved successfully!';
       } else {
-        // Иначе - выводим сообщение о провале
+        // Если сохранение не удалось - выводим сообщение о провале
         status.innerText = 'Save failed!';
       }
     });
   }
 
+  // Сбрасываем фокус с кнопки "Save As..."
   btnSaveAs.blur();
 });
 
-// При нажатии по заголовку программы переходим в репо
+// Обрабатываем нажатие на заголовок программы
 title.addEventListener('click', () => {
+  // Переходим в репозиторий приложения
   shell.openExternal('https://github.com/lozunoff/xml-beautifier-app');
 });
 
-// При нажатии по типу лицензии переходим в описание лицензии в репо
+// Обрабатываем нажатие по названию лицензии
 licenseLink.addEventListener('click', () => {
+  // Переходим в репозиторий приложения на страницу с текстом лицензии
   shell.openExternal('https://github.com/lozunoff/xml-beautifier-app/blob/master/LICENSE');
 });
 
 // Обрабатываем скролл в input
 input.addEventListener('scroll', () => {
-  // Проверяем, что счетчик выведенных в строк меньше общего кол-ва строк
+  // Проверяем, что в input выведена только часть строк
   if (inputRowCounter < inputArray.length) {
+    const options = getOptionsFromStorage();
     // Добавляем при прокрутке новые строки
-    input.insertAdjacentText('beforeEnd', `${inputArray[inputRowCounter]}\r\n`);
+    input.insertAdjacentText('beforeEnd', `${inputArray[inputRowCounter]}${options.endLine}`);
     // Увеличиваем счетчик
     inputRowCounter += 1;
   }
@@ -206,7 +231,7 @@ input.addEventListener('scroll', () => {
 
 // Обрабатываем скролл в output
 output.addEventListener('scroll', () => {
-  // Проверяем, что счетчик выведенных в строк меньше общего кол-ва строк
+  // Проверяем, что в output выведена только часть строк
   if (outputRowCounter < outputArray.length) {
     // Добавляем при прокрутке новые строки
     output.insertAdjacentText('beforeEnd', outputArray[outputRowCounter]);
