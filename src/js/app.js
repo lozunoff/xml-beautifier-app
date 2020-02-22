@@ -239,6 +239,7 @@ input.addEventListener('input', () => {
   } else {
     // Меняем содержимое массива полностью
     inputArray = input.innerText.split(options.endLine);
+    inputRowCounter = inputArray.length;
   }
 });
 
