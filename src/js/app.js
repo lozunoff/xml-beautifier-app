@@ -73,7 +73,7 @@ btnUpload.addEventListener('click', async () => {
         input.scrollTop = 0;
         input.scrollLeft = 0;
         // Разбиваем содержимое файла на массив строк
-        inputArray = content.split(/(\r\n|\n|\r)+/);
+        inputArray = content.split(/\r\n|\n|\r/);
         // Если после разбивки получается меньше 1000 строк
         if (inputArray.length < 1000) {
           // Выводим в input весь полученный текст
