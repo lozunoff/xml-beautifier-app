@@ -229,6 +229,19 @@ input.addEventListener('scroll', () => {
   }
 });
 
+// Обрабатываем редактирование текста в input
+input.addEventListener('input', () => {
+  const options = getOptionsFromStorage();
+  // Проверяем, что в input выведена только часть строк
+  if (inputRowCounter < inputArray.length) {
+    // Меняем содержимое массива со строками частично
+    inputArray.splice(0, inputRowCounter, ...input.innerText.split(options.endLine));
+  } else {
+    // Меняем содержимое массива полностью
+    inputArray = input.innerText.split(options.endLine);
+  }
+});
+
 // Обрабатываем скролл в output
 output.addEventListener('scroll', () => {
   // Проверяем, что в output выведена только часть строк
