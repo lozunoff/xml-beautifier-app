@@ -24,6 +24,33 @@ const createWindow = () => {
 
   // Скрываем стандартное меню окна
   mainWindow.removeMenu();
+
+  // Создаем окно с настройками
+  const settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 300,
+    parent: mainWindow,
+    modal: true,
+    minimizable: false,
+    maximizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      devTools: false,
+    },
+    show: false,
+  });
+
+  // Загружаем в окно settings.html
+  settingsWindow.loadFile(path.join(__dirname, 'html/settings.html'));
+
+  // Скрываем стандартное меню окна
+  settingsWindow.removeMenu();
+
+  // Скрываем модальное окно вместо закрытия
+  settingsWindow.on('close', (e) => {
+    e.preventDefault();
+    settingsWindow.hide();
+  });
 };
 
 // Приступаем к созданию окна после инициализации приложения
