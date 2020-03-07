@@ -163,12 +163,27 @@ const beautify = (xml, options = {
 
   // Проверяем, была ли декларация у исходного текста
   if (input.indexOf('<?xml') !== -1) {
-    // Получаем значение исходной кодировки или присваиваем значение по умолчанию
-    const encoding = input.match(/<\?xml.+encoding=['"]([\w-]+)['"].*\?>/i)[1] || 'utf-8';
-    // Получаем версию xml или присваиваем значение по умолчанию
-    const version = input.match(/<\?xml.+version=['"]([\d.]+)['"].*\?>/i)[1] || '1.0';
     // Формируем декларацию и добавляем в результат
-    const declaration = `<?xml version="${version}" encoding="${encoding}"?>`;
+    let declaration = '<?xml';
+
+    // Ищем в исходной декларации версию xml, кодировку и параметр standalone
+    const version = input.match(/<\?xml.+version=['"]([\d.]+)['"].*\?>/i);
+    const encoding = input.match(/<\?xml.+encoding=['"]([\w-]+)['"].*\?>/i);
+    const standalone = input.match(/<\?xml.+standalone=['"](yes|no)['"].*\?>/i);
+
+    if (version) {
+      declaration += ` version="${version[1]}"`;
+    }
+
+    if (encoding) {
+      declaration += ` encoding="${encoding[1]}"`;
+    }
+
+    if (standalone) {
+      declaration += ` standalone="${standalone[1]}"`;
+    }
+
+    declaration += '?>';
     output.unshift(`${declaration}${endLine}`);
   }
 
