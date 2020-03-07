@@ -20,7 +20,7 @@ const createWindow = () => {
   });
 
   // Загружаем в главное окно app.html
-  mainWindow.loadFile(path.join(__dirname, 'html/app.html'));
+  mainWindow.loadFile(path.join(__dirname, 'html', 'app.html'));
 
   // Создаем окно с настройками
   const settingsWindow = new BrowserWindow({
@@ -40,7 +40,7 @@ const createWindow = () => {
   });
 
   // Загружаем в окно settings.html
-  settingsWindow.loadFile(path.join(__dirname, 'html/settings.html'));
+  settingsWindow.loadFile(path.join(__dirname, 'html', 'settings.html'));
 
   // Скрываем модальное окно вместо закрытия
   settingsWindow.on('close', (e) => {
