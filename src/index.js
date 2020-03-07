@@ -11,8 +11,8 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1100,
     height: 690,
-    minWidth: 470,
-    minHeight: 542,
+    minWidth: 990,
+    minHeight: 690,
     webPreferences: {
       nodeIntegration: true,
       devTools: false,
@@ -29,6 +29,8 @@ const createWindow = () => {
   const settingsWindow = new BrowserWindow({
     width: 400,
     height: 300,
+    minWidth: 400,
+    minHeight: 300,
     parent: mainWindow,
     modal: true,
     minimizable: false,

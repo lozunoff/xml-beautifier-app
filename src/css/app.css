@@ -59,6 +59,7 @@
 
 .app__status-bar {
   width: 300px;
+  height: 37px;
   margin: 0 30px;
   display: flex;
   justify-content: center;
@@ -100,6 +101,7 @@
 .btn {
   display: inline-block;
   width: 150px;
+  height: 37px;
   text-align: center;
   vertical-align: middle;
   color: #2b2b2b;
@@ -108,7 +110,6 @@
   line-height: 1.5;
   border-radius: .25rem;
   border: 1px solid #ffc107;
-  padding: .375rem .75rem;
   background-color: #ffc107;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
