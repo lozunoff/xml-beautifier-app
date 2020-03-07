@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
 // Обрабатываем на Windows события создания/удаления ярлыков при инсталяции/деинсталяции приложения
@@ -22,9 +22,6 @@ const createWindow = () => {
   // Загружаем в главное окно app.html
   mainWindow.loadFile(path.join(__dirname, 'html/app.html'));
 
-  // Скрываем стандартное меню окна
-  mainWindow.removeMenu();
-
   // Создаем окно с настройками
   const settingsWindow = new BrowserWindow({
     width: 400,
@@ -45,15 +42,15 @@ const createWindow = () => {
   // Загружаем в окно settings.html
   settingsWindow.loadFile(path.join(__dirname, 'html/settings.html'));
 
-  // Скрываем стандартное меню окна
-  settingsWindow.removeMenu();
-
   // Скрываем модальное окно вместо закрытия
   settingsWindow.on('close', (e) => {
     e.preventDefault();
     settingsWindow.hide();
   });
 };
+
+// Скрываем стандартное меню окна
+Menu.setApplicationMenu(null);
 
 // Приступаем к созданию окна после инициализации приложения
 app.on('ready', createWindow);
