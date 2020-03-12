@@ -1,6 +1,11 @@
 # XML Beautifier App
 A cross-platform desktop application for converts XML into a human readable format (pretty print).
 
+# Supported OS
+- Microsoft Windows
+- Linux (most distributions)
+- MacOS
+
 # How to build app?
 Download or clone this project:
 ```
